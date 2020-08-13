@@ -29,8 +29,7 @@ services:
       PHPLDAPADMIN_LDAP_HOSTS: "ldap-host"
       PHPLDAPADMIN_HTTPS: "true"
     ports:
-      - "8080:80"
-      - "8081:443"
+      - "8080:443"
     networks:
       default:
         ipv4_address: 172.30.0.12
