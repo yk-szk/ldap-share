@@ -1,0 +1,68 @@
+version: '3'
+
+services:
+  ldap-host:
+    image: osixia/openldap:latest
+    restart: always
+    container_name: ldap-host
+    hostname: ldap-host
+    environment:
+      LDAP_ORGANISATION: "${LDAP_ORGANISATION}"
+      LDAP_DOMAIN: "${LDAP_ORGANISATION}.${LDAP_DOMAIN}"
+      LDAP_ADMIN_PASSWORD: "${LDAP_ADMIN_PASSWORD}"
+    ports:
+      - 389:389
+      - 636:636
+    volumes:
+      - ./volume/ldap/ldap:/var/lib/ldap
+      - ./volume/ldap/slapd:/etc/ldap/slapd.d
+    networks:
+      default:
+        ipv4_address: 172.30.0.11
+
+  ldap-admin:
+    image: osixia/phpldapadmin:latest
+    restart: always
+    container_name: ldap-admin
+    hostname: ldap-admin
+    environment:
+      PHPLDAPADMIN_LDAP_HOSTS: "ldap-host"
+      PHPLDAPADMIN_HTTPS: "true"
+    ports:
+      - "8080:80"
+      - "8081:443"
+    networks:
+      default:
+        ipv4_address: 172.30.0.12
+
+  samba:
+    restart: always
+    build:
+      context: ./samba
+      args:
+        - 'LDAP_BASE_DN=dc=${LDAP_ORGANISATION},dc=${LDAP_DOMAIN}'
+        - 'LDAP_URI=ldap://ldap-host'
+        - 'LDAP_ADMIN_ACCOUNT=cn=admin,dc=${LDAP_ORGANISATION},dc=${LDAP_DOMAIN}'
+        - 'LDAP_ADMIN_PASSWORD=${LDAP_ADMIN_PASSWORD}'
+        - 'LDAP_ORGANISATION=${LDAP_ORGANISATION}'
+    tty: true
+    container_name: samba
+    hostname: samba
+    ports:
+      - "139:139/tcp"
+      - "445:445/tcp"
+    volumes:
+      - ./volume/samba:/samba
+    networks:
+      default:
+        ipv4_address: 172.30.0.13
+
+networks:
+  default:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.30.0.0/24
+    driver_opts:
+      com.docker.network.bridge.name: br_docker
