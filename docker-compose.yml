@@ -56,7 +56,7 @@ services:
       default:
         ipv4_address: 172.30.0.13
 
-dnsmasq:
+  dnsmasq:
     restart: unless-stopped
     build:
       context: ./dns
@@ -68,6 +68,16 @@ dnsmasq:
       default:
         ipv4_address: 172.30.0.14
 
+  httpd:
+    restart: unless-stopped
+    image: httpd
+    container_name: 'httpd'
+    hostname: 'httpd'
+    volumes:
+      - ${HTTP_DIR}:/usr/local/apache2/htdocs/
+    networks:
+      default:
+        ipv4_address: 172.30.0.15
 
 networks:
   default:
