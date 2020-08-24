@@ -1,5 +1,5 @@
 # LDAP-Share
-OpenLDAP server + SMB
+OpenLDAP server + SMB etc.
 
 ## Set up
 1. Edit .env
@@ -8,3 +8,5 @@ OpenLDAP server + SMB
 ## Volumes
 - `volume/ldap` : open ldap's data 
 - `volume/samba` : smb's shared directory
+
+- `volume/http` : 
