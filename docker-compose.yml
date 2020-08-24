@@ -56,6 +56,19 @@ services:
       default:
         ipv4_address: 172.30.0.13
 
+dnsmasq:
+    restart: unless-stopped
+    build:
+      context: ./dns
+    container_name: 'dns-server'
+    hostname: 'dns-server'
+    volumes:
+      - ./dnsmasq.conf:/etc/dnsmasq.conf
+    networks:
+      default:
+        ipv4_address: 172.30.0.14
+
+
 networks:
   default:
     driver: bridge
